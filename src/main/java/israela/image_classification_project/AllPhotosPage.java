@@ -35,6 +35,15 @@ public class AllPhotosPage extends VerticalLayout{
     {
         this.photoServise = photoServise;
         this.userServise = userServise;
+
+        //admin בדיקה האם המשתמש הוא
+        Long id = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
+        User user = userServise.getUserById(id);
+        if(user.getAdmin()==false)
+        {
+            UI.getCurrent().getPage().setLocation("/home");
+        }
+        
         if (!isUserAuthorized())
         {
             System.out.println("-------- User NOT Authorized - can't use! --------");
@@ -45,13 +54,8 @@ public class AllPhotosPage extends VerticalLayout{
 
         v = new VerticalLayout();
         v2 = new VerticalLayout();
-        //admin בדיקה האם המשתמש הוא
-        Long id = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
-        User user = userServise.getUserById(id);
-        if(user.getAdmin()==false)
-        {
-            UI.getCurrent().getPage().setLocation("/home");
-        }
+        
+        
 
         Long idOfUser = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
         boolean res = photoServise.removePhotoWithoutClassification(idOfUser, "Null classification");

@@ -1,7 +1,5 @@
 package israela.image_classification_project;
 
-
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -46,10 +44,20 @@ public class UploadPhotoPage extends VerticalLayout{
 
     private String strPredictions;
 
+    private VerticalLayout notifiLayout;
+    private VerticalLayout photoAndBtnLayout;
+
+    private VerticalLayout strPredicted;
+
+    private UI ui;
+
     public  UploadPhotoPage(PhotoServise photoService, UserServise userServise) {
         this.photoService = photoService;
         this.userServise = userServise;
         strPredictions = "";
+        notifiLayout = new VerticalLayout();
+        photoAndBtnLayout = new VerticalLayout();
+        strPredicted = new VerticalLayout();
         
 
         if (!isUserAuthorized())
@@ -117,7 +125,8 @@ public class UploadPhotoPage extends VerticalLayout{
             Notification.show("You must upload a photo before sending for evaluation",10000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_WARNING);
             return;
         }*/
-
+        
+        //add(verticalLayout);
         Photo photo = photoService.getPhotoById(this.photoIDofMongo);
         System.out.println("sendToNN==>>"+photo.getName());
         byte[] photoFileContend = uploadPhoto.getContend();
@@ -143,9 +152,9 @@ public class UploadPhotoPage extends VerticalLayout{
         } catch (Exception e) {
             System.out.println("OutputStream =====>>"+e.toString());
         }
-
-        String pathPython = "C:\\Users\\user\\Documents\\VSProj\\milestone2\\src\\main\\java\\israela\\milestone2\\CNN.py";
-        //String pathImage = "C:\\Users\\user\\Desktop\\savePhoto\\"+photoID+".png";
+        String pathPython = "executable/CNN.py";
+        //String pathPython = "C:\\Users\\user\\Documents\\VSProj\\image_classification_project\\src\\main\\java\\israela\\image_classification_project\\CNN.py";
+        //String pathImage = "C:\\Users\\u  ser\\Desktop\\savePhoto\\"+photoID+".png";
         String pathImage = "C:\\Users\\user\\Desktop\\savePhoto\\"+photoIDofMongo+".jpg";
         //String pathImage ="C:\\Users\\user\\Desktop\\savePhoto\\00c5774bc9883453a565f949e4b1e19b.jpg";
 
@@ -153,12 +162,13 @@ public class UploadPhotoPage extends VerticalLayout{
         cmd[0] = "python";
         cmd[1] = pathPython;
         cmd[2] = pathImage;
-
         
         strPredictions ="";
         Runtime r = Runtime.getRuntime();
         System.out.println("Runtime==>>");
         try {
+            //מייצגת תהליך מערכת
+            //כאשר פקודה מבוצעת באמצעות exec(), היא מחזירה אובייקט Process המייצג את התהליך החדש שנוצר.
             Process p = r.exec(cmd);
             BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
             while((strOfOutpotPhyton=in.readLine()) != null){
@@ -185,16 +195,18 @@ public class UploadPhotoPage extends VerticalLayout{
                 strPredictions = "Abstract";
             }
 
-            add(new H2("The model classified your image into a category: "+strPredictions));
+            strPredicted.add(new H2("The model classified your image into a category: "+strPredictions));
+            //add(strPredicted);
             if(p>50)
             {
-                add(new H2("with an accuracy of: "+p));
+                strPredicted.add(new H2("with an accuracy of: "+p));
             }
             else{
                 double p2 = 100-p;
-                add(new H2("with an accuracy of: "+p2));
+                strPredicted.add(new H2("with an accuracy of: "+p2));
             }
-
+            strPredicted.setAlignItems(Alignment.CENTER);
+            add(strPredicted);
             boolean b =photoService.setClassification(uploadPhoto, strPredictions);
                 if(b==true){
                     System.out.println("secsses");
@@ -221,6 +233,8 @@ public class UploadPhotoPage extends VerticalLayout{
             } catch (Exception e) {
                 System.out.println("\nfailed to deleted the file"+e.toString());
             }
+
+            notifiLayout.removeAll();
         
     }
     private void sendToCNN2() {
@@ -504,24 +518,19 @@ private void sendToCNN3(){
 
     private void creatPhotoUpload() {
 
+        
+        //photoAndBtnLayout = new VerticalLayout();
         /* Example for MemoryBuffer */
-
+        ui = UI.getCurrent();
         MemoryBuffer memoryBuffer = new MemoryBuffer();//מאגר נתונים (או סתם מאגר) הוא אזור בזיכרון המשמש לאחסון נתונים באופן זמני בזמן שהם מועברים ממקום אחד לאחר
         singleFileUpload = new Upload(memoryBuffer);
         singleFileUpload.setAcceptedFileTypes("image/*");
         //singleFileUpload.setMaxFileSize(0);//הגבלה של הגודל
 
         singleFileUpload.addSucceededListener(event -> {
-            Notification.show("Photo Upload to Server Succeeded!", 5000, Position.TOP_CENTER);
-
-            // Get information about the uploaded file
-            //InputStream fileData = memoryBuffer.getInputStream();
-            //String fileName = event.getFileName();
-            //long contentLength = event.getContentLength();
-            //String mimeType = event.getMIMEType();
-
-            // Do something with the file data
-            // processFile(fileData, fileName, contentLength, mimeType);
+            photoAndBtnLayout.removeAll();
+            strPredicted.removeAll();
+            Notification.show("Photo Upload to Server Succeeded!", 5000, Position.BOTTOM_START);
 
             System.out.println("File name: "+event.getFileName());
             System.out.println("File size: "+event.getContentLength());
@@ -529,23 +538,34 @@ private void sendToCNN3(){
             System.out.println("");
         
             try {
+                HorizontalLayout btnLayout = new HorizontalLayout();
                 photoFileContend =  memoryBuffer.getInputStream().readAllBytes();
                 
-                
-                //showPhotoOnPage(photoFileContend, uploadPhoto);
                 Long idUser = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
                 User user = userServise.getUserById(idUser);
-                
-                //uploadPhoto.setPhoto(event.getFileName(), user.getName(), photoFileContend);
-                uploadPhoto = new Photo(event.getFileName(), user.getName(), photoFileContend);
-                
-                //this.photoIDofMongo = photoService.addPhoto(uploadPhoto, idUser);
-                this.photoIDofMongo = photoService.addPhoto(uploadPhoto, idUser);
-                
-                add(new Button("Send to Evaluation", e -> sendToCNN()));
-                add(new Button("Remove Photo", e -> remove((String)VaadinSession.getCurrent().getSession().getAttribute("userId"))));
 
-                //Notification.show("Photo Upload to DB Succeeded!", 5000, Position.TOP_CENTER);
+                uploadPhoto = new Photo(event.getFileName(), user.getName(), photoFileContend);
+                this.photoIDofMongo = photoService.addPhoto(uploadPhoto, idUser);
+                btnLayout.add(new Button("Send to model", e -> {
+                    notifiay();
+
+                    Thread t = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //System.out.println("UI.getCurrent()= "+UI.getCurrent().getId());
+                            ui.access(() -> sendToCNN());
+                        }
+
+                    
+                    });
+                    t.start();
+
+                    
+                }));
+                
+                btnLayout.add(new Button("Remove Photo", e -> remove((String)VaadinSession.getCurrent().getSession().getAttribute("userId"))));
+                //add(btnLayout);
+                photoAndBtnLayout.add(btnLayout);
                
                 //showPhotoOnPage(photoFileContend, uploadPhoto);
                 try{
@@ -555,6 +575,8 @@ private void sendToCNN3(){
                 System.out.println("*****************************\n");
                 //showPhotoOnPage(list.get(list.size()-1).getContend(), uploadPhoto);
                 showPhotoOnPage(uploadPhoto.getContend(), uploadPhoto);
+                photoAndBtnLayout.setAlignItems(Alignment.CENTER);
+                add(photoAndBtnLayout);
                 }
                 catch (Exception e){
                     System.out.println("error of photoService====>>\n");
@@ -569,6 +591,15 @@ private void sendToCNN3(){
         
     }
     
+    private void notifiay() {
+        
+        String zzzString = "The model is calculating, please wait";
+        Notification.show(zzzString,5000,Position.TOP_CENTER);
+        //verticalLayout.add(zzzString);
+        setAlignItems(Alignment.CENTER);
+
+    }
+
     private void showPhotoOnPage(byte[] photoFileContend, Photo uploadPhotoo) {
 
         StreamResource resource = new StreamResource("stam.jpg", new InputStreamFactory() 
@@ -582,7 +613,8 @@ private void sendToCNN3(){
         Image image = new Image(resource, uploadPhotoo.getName());
         image.setHeight("200px");
         image.setWidth("200px");
-        add(image);
+        //add(image);
+        photoAndBtnLayout.add(image);
   
     }
 

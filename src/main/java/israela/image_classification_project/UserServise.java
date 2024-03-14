@@ -109,6 +109,7 @@ public class UserServise {
 
     public List<User> getAllUser() {
         List<User> arrayListUser = userRepo.findAll();
+        System.out.println("arrayListUser = "+arrayListUser.size());
         
         return arrayListUser;
     }

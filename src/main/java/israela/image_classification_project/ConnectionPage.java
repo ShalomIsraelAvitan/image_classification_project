@@ -30,7 +30,7 @@ public class ConnectionPage extends VerticalLayout{
         System.out.println("Start ConnectionPage=======>\n");
     setAlignItems(Alignment.CENTER);
 
-    add(new H2("Connectio Page"));
+    add(new H2("Connection Page"));
 
       //Image image = new Image("images/israel.jpeg", "יחד ננצח");
       //image.setWidth("600px");
@@ -72,6 +72,8 @@ public class ConnectionPage extends VerticalLayout{
       // set all components in the Center of page
       setSizeFull();
       setAlignItems(Alignment.CENTER);
+      //getStyle().set("background","hsl(180, 100%, 90%)");
+      //getStyle().set("background","#FFC0CB");
    }
 
    private void loginAdminTest() {

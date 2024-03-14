@@ -70,8 +70,9 @@ public class AppMainLayout extends AppLayout
    {
       // Invalidate Session (delete the user-session-id and all its attributes)
       VaadinSession.getCurrent().getSession().invalidate();
+      UI.getCurrent().getPage().setLocation("/"); 
 
       // Reload this page with new user-session-id
-      UI.getCurrent().getPage().reload();
+      //UI.getCurrent().getPage().reload();
    }
 }

@@ -103,6 +103,25 @@ public class SignUpPage extends VerticalLayout{
         if (userService.isIdUsd(iD)) {
             Notification.show("This ID allready Usd",5000, Position.TOP_CENTER);
         }
+
+        boolean x = userService.addUser(newUser);
+            VaadinSession.getCurrent().getSession().setAttribute("username", name.getValue());
+            VaadinSession.getCurrent().getSession().setAttribute("userId", id.getValue());
+            
+            if(x==true )
+            {
+                Notification.show("User successfully Sign Up",5000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+
+                UI.getCurrent().navigate("/home");
+            }
+            else{
+                Notification.show("User failed to Sign Up",5000,Position.TOP_CENTER);
+            }
+
+        /* 
+        if (userService.isIdUsd(iD)) {
+            Notification.show("This ID allready Usd",5000, Position.TOP_CENTER);
+        }
         else if(userService.isUserExists(name.getValue(),  iD, password)!= false)
         {
             Notification.show("This User Exsist",5000, Position.TOP_CENTER);
@@ -126,6 +145,6 @@ public class SignUpPage extends VerticalLayout{
             else{
                 Notification.show("User failed to Sign Up",5000,Position.TOP_CENTER);
             }
-        }   
+        }   */
     }
 }

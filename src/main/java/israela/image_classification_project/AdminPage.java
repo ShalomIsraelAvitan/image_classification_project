@@ -26,6 +26,8 @@ import com.vaadin.flow.server.VaadinSession;
 
 import israela.image_classification_project.UserServise.UserGridChangeListener;
 
+
+
 @Route(value = "/admin",layout = AppMainLayout.class)
 @PageTitle("admin")
 public class AdminPage extends VerticalLayout{
@@ -34,7 +36,7 @@ public class AdminPage extends VerticalLayout{
     private PhotoServise photoServise;
     private String userName;
     private UserServise userServise;
-    private VerticalLayout v;
+    private VerticalLayout verLayout;
 
     private User userChos;
     public AdminPage(PhotoServise photoServise, UserServise userServise)
@@ -63,7 +65,7 @@ public class AdminPage extends VerticalLayout{
             UI.getCurrent().getPage().setLocation("/"); // Redirect to login page (HomePage).
             return;
         }
-        v = new VerticalLayout();
+        verLayout = new VerticalLayout();
         Long id = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
         if(id != 111111111)
         {
@@ -82,9 +84,11 @@ public class AdminPage extends VerticalLayout{
         Button btnShowPhotoUser = new Button("Show Photo User", e ->showAllPhotoUser(userChos));
         Button btnShowAllPhotos = new Button("Show All Photos", e ->showAllPhotos());
         btnShowAllPhotos.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        Button btnRemoveAllPhotos = new Button("RemoveAllPhotos", e -> removeAllPhotos());
+        Button btnRemoveAllPhotos = new Button("Remove All Photos", e -> removeAllPhotos());
         btnRemoveAllPhotos.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
-        bottonPanel.add(refreshBtn,deletBtn,btnShowPhotoUser,btnShowAllPhotos,btnRemoveAllPhotos);
+        Button btnMeasureModel = new Button("Measure Model", e -> nevigatMeasureModel());
+        btnMeasureModel.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        bottonPanel.add(refreshBtn,deletBtn,btnShowPhotoUser,btnShowAllPhotos,btnRemoveAllPhotos,btnMeasureModel);
         
 
         //grid users
@@ -128,7 +132,7 @@ public class AdminPage extends VerticalLayout{
             {
                 UI ui = getUI().orElseThrow();
                 ui.access(() -> refresh());
-                String msg = "\n---> " + userName + ": refreshChat() called from Listener ONLY when Chat changed!";
+                String msg = "\n---> " + userName + ": refreshChat() called from Listener ONLY when User Grid changed!";
                 System.out.println(msg);
             }
         });
@@ -141,6 +145,10 @@ public class AdminPage extends VerticalLayout{
         // });
 
         System.out.println("\n=======> ChatPage('/chat') constructor ends!\n");
+    }
+
+    private void nevigatMeasureModel() {
+        UI.getCurrent().getPage().setLocation("/measuremodel");
     }
 
     private void removeAllPhotos() {
@@ -190,6 +198,7 @@ public class AdminPage extends VerticalLayout{
             Notification.show("User Not delet",5000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
     }
     private void refresh() {
+        System.out.println("start refresh====>>\n");
         gridUser.setItems(userServise.getAllUser());
          //List<Photo> list = photoServise.getPhotoByUserId(userChos.getId());
         //gridPhotoUser.setItems(list);
@@ -209,7 +218,7 @@ public class AdminPage extends VerticalLayout{
     private void showAllPhotoUser(User user) {
        
         
-        v.removeAll();
+        verLayout.removeAll();
          if(user.getName().equals(null))
          {
             Notification.show("mast choose User",5000,Position.BOTTOM_START).addThemeVariants(NotificationVariant.LUMO_WARNING);
@@ -220,9 +229,10 @@ public class AdminPage extends VerticalLayout{
         if(list.size()==0)
         {
             H2 h = new H2("There are no images to display");
-            v.add(h);
-            v.setAlignItems(Alignment.CENTER);
-            add(v);
+            verLayout.add(h);
+            verLayout.setAlignItems(Alignment.CENTER);
+            add(verLayout);
+            Notification.show("showAllPhotoUser Succeeded",4000,Position.BOTTOM_START);
             return; 
         }
        
@@ -230,6 +240,7 @@ public class AdminPage extends VerticalLayout{
         {
             showPhotoOnPage(list.get(i).getContend(), list.get(i));
         }
+        Notification.show("showAllPhotoUser Succeeded",4000,Position.BOTTOM_START);
         userChos = new User(null, null, 0);
         //add(gridPhotoUser);
             
@@ -257,7 +268,7 @@ public class AdminPage extends VerticalLayout{
          heder.add(new H4(str));
          heder.add(str2);
          //add(heder);
-         v.add(heder);
+         verLayout.add(heder);
          
          str = "Classification: ";
          str2 = photo.getClassification()+"\n";
@@ -265,11 +276,11 @@ public class AdminPage extends VerticalLayout{
          heder2.add(str2);
          //add(heder2);
          //add(image);
-         v.add(heder2);
-         v.add(image);
+         verLayout.add(heder2);
+         verLayout.add(image);
          
-         v.setAlignItems(Alignment.CENTER);
-         add(v);
+         verLayout.setAlignItems(Alignment.CENTER);
+         add(verLayout);
          
   
     }
