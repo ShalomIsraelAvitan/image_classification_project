@@ -116,7 +116,7 @@ public class LoginPage extends VerticalLayout
             VaadinSession.getCurrent().getSession().setAttribute("userId", id.getValue());
             Notification.show("User Log In successfully",5000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);;
             //UI.getCurrent().navigate("/upload");
-            UI.getCurrent().getPage().setLocation("/home");
+            UI.getCurrent().getPage().setLocation("/");
             return true;
 
         }

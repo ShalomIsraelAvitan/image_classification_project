@@ -112,7 +112,7 @@ public class SignUpPage extends VerticalLayout{
             {
                 Notification.show("User successfully Sign Up",5000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
 
-                UI.getCurrent().navigate("/home");
+                UI.getCurrent().navigate("/");
             }
             else{
                 Notification.show("User failed to Sign Up",5000,Position.TOP_CENTER);

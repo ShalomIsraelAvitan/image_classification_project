@@ -18,13 +18,13 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
-@Route(value = "/")
+@Route(value = "/Connection", layout = AppMainLayout.class)
 @PageTitle("Connection")
 public class ConnectionPage extends VerticalLayout{
 
     private String sessionId, userName;
     private UserServise userService;
-    private static final String CHAT_IMAGE_URL = "https://www.smorescience.com/wp-content/uploads/2023/08/Featured-Images-50.jpg";
+    private static final String LOGO_IMAGE_URL = "https://www.smorescience.com/wp-content/uploads/2023/08/Featured-Images-50.jpg";
     public  ConnectionPage(UserServise userServise) {
         this.userService = userServise;
         System.out.println("Start ConnectionPage=======>\n");
@@ -45,8 +45,8 @@ public class ConnectionPage extends VerticalLayout{
          welcomeMsg = "Welcome " + userName.toUpperCase();
 
       // create image for chat page   
-      Image imgChat = new Image(CHAT_IMAGE_URL, "Connectio image");
-      imgChat.setHeight("250px");
+      Image imgPage = new Image(LOGO_IMAGE_URL, "Connectio image");
+      imgPage.setHeight("250px");
 
 
       HorizontalLayout helloPanel = new HorizontalLayout();
@@ -62,7 +62,7 @@ public class ConnectionPage extends VerticalLayout{
       helloPanel.add(btnLogin,btnSignUp);
 
       add(new Text(new Date() + ""));
-      add(imgChat);
+      add(imgPage);
       add(new H1(welcomeMsg));
       add(new H3("( SessionID: " + sessionId + " )"));
       add( helloPanel);

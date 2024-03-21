@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 
-@Push
+@Push		
 @SpringBootApplication
 public class AppMain implements AppShellConfigurator{
 

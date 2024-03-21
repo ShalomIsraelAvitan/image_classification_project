@@ -40,7 +40,8 @@ def predict_image(loaded_model, image_path):
 
 #preprocessed_image = "C:\\Users\\user\\Desktop\\models"
 
-loaded_model = keras.models.load_model("C:\\Users\\user\\Desktop\\model3")
+#loaded_model = keras.models.load_model("C:\\Users\\user\\Desktop\\model3")
+loaded_model = keras.models.load_model("src\\main\\resources\\models")
 #C:\Users\user\Documents\VSProj\milestone2\src\main\resources\model
 #loaded_model = keras.models.load_model("src\\main\\resources\\model")
 image_path = sys.argv[1]

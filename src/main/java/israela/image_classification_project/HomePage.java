@@ -14,7 +14,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
-@Route(value = "/home",layout = AppMainLayout.class)
+@Route(value = "/",layout = AppMainLayout.class)
 @PageTitle("Home")
 public class HomePage extends VerticalLayout{
 
@@ -24,17 +24,8 @@ public class HomePage extends VerticalLayout{
     private static final String IMAGE_URL = "https://www.smorescience.com/wp-content/uploads/2023/08/Featured-Images-50.jpg";
     public  HomePage(PhotoServise photoService) {
     setAlignItems(Alignment.CENTER);
-    if (!isUserAuthorized())
-        {
-            System.out.println("-------- User NOT Authorized - can't use! --------");
-            //Notification.show("You need to login or register first",5000,Position.TOP_CENTER);
-            UI.getCurrent().getPage().setLocation("/"); // Redirect to login page (HomePage).
-            return;
-        }
 
-    
-
-      // Get from Session the 'username' attribute 
+    // Get from Session the 'username' attribute 
     userName = (String)VaadinSession.getCurrent().getSession().getAttribute("username");
 
       // if no 'username' attribute, this is a Guest.
@@ -42,9 +33,11 @@ public class HomePage extends VerticalLayout{
       if (userName != null)
          welcomeMsg = "Welcome " + userName.toUpperCase();
 
-      // create image for chat page   
-      Image imgLogo = new Image(IMAGE_URL, "Home image");
-      imgLogo.setHeight("250px");
+      // create image for Layout page   
+      Image imgLogoLayout = new Image(IMAGE_URL, "Home image");
+      imgLogoLayout.setHeight("250px");
+
+      
 
       add(new H2("Home Page"));
       creatInformationForUser(welcomeMsg);
@@ -54,6 +47,9 @@ public class HomePage extends VerticalLayout{
       setAlignItems(Alignment.CENTER);
    }
    private void creatInformationForUser(String welcomeMsg) {
+
+      Image imgLogo = new Image(IMAGE_URL, "Home image");
+      imgLogo.setHeight("250px");
     HorizontalLayout helloPanel = new HorizontalLayout();
     helloPanel.setAlignItems(Alignment.BASELINE);
     //TextField fieldName = new TextField("Your Name");
@@ -70,9 +66,10 @@ public class HomePage extends VerticalLayout{
     //helloPanel.add(btnLogin,btnSignUp);
     helloPanel.add(new H3(str));
     
-    add(new Text(new Date() + ""));
+    //add(new Text(new Date() + ""));
     //add(imgLogo);
     add(new H1(welcomeMsg));
+    add(imgLogo);
     //add(new H3("( SessionID: " + sessionId + " )"));
     add( helloPanel);
     HorizontalLayout horizontalLayout = new HorizontalLayout();

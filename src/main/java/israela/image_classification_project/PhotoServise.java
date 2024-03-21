@@ -142,7 +142,7 @@ public class PhotoServise {
             boolean res = photo.setClassification(strPredictions);
             if (res==true) {
                 photoRepo.save(photo);
-            System.out.println("YESSS in setClassification======>>");
+                System.out.println("YESSS in setClassification======>>");
             }
             else{
                 System.out.println("משהו לא עובד במחלקה");

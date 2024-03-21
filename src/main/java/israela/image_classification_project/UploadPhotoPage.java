@@ -12,8 +12,10 @@ import java.util.stream.Collectors;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
@@ -28,6 +30,10 @@ import com.vaadin.flow.server.InputStreamFactory;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
 
+import israela.image_classification_project.UploadPhotoServise.LongTasklistener;
+
+//import israela.image_classification_project.UploadPhotoServise.LongTasklistener;
+
 //import py4j.GatewayServer;
 //from py4j.java_gateway import JavaGateway;
 
@@ -37,6 +43,7 @@ public class UploadPhotoPage extends VerticalLayout{
     private Upload singleFileUpload; //UI component (file upload)
     private Photo uploadPhoto;
     private String photoIDofMongo;
+    private UploadPhotoServise uploadPhotoServise;
 
     private String strOfOutpotPhyton;
     private byte[] photoFileContend; 
@@ -46,18 +53,20 @@ public class UploadPhotoPage extends VerticalLayout{
 
     private VerticalLayout notifiLayout;
     private VerticalLayout photoAndBtnLayout;
-
-    private VerticalLayout strPredicted;
+    private VerticalLayout strPredictedVerticalLayout;
 
     private UI ui;
 
-    public  UploadPhotoPage(PhotoServise photoService, UserServise userServise) {
+    private Thread longTaskThread;
+
+    public  UploadPhotoPage(PhotoServise photoService, UserServise userServise,UploadPhotoServise uploadPhotoServise) {
         this.photoService = photoService;
         this.userServise = userServise;
+        this.uploadPhotoServise = uploadPhotoServise;
         strPredictions = "";
         notifiLayout = new VerticalLayout();
         photoAndBtnLayout = new VerticalLayout();
-        strPredicted = new VerticalLayout();
+        strPredictedVerticalLayout = new VerticalLayout();
         
 
         if (!isUserAuthorized())
@@ -111,6 +120,8 @@ public class UploadPhotoPage extends VerticalLayout{
                 Notification.show("remove Succeeded",5000, Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
                 this.photoIDofMongo = null;
              }
+             photoAndBtnLayout.removeAll();
+            strPredictedVerticalLayout.removeAll();
             
         } catch (Exception e) {
             Notification.show("Remove Failed",5000, Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);
@@ -126,24 +137,26 @@ public class UploadPhotoPage extends VerticalLayout{
             return;
         }*/
         
-        //add(verticalLayout);
+        
         Photo photo = photoService.getPhotoById(this.photoIDofMongo);
         System.out.println("sendToNN==>>"+photo.getName());
         byte[] photoFileContend = uploadPhoto.getContend();
         System.out.println("========================>>"+photoFileContend.toString());
        // Notification.show("The model start working",5000, Position.TOP_CENTER);
-        StreamResource resource = new StreamResource("stam.jpg", new InputStreamFactory() 
-        {
-            public java.io.InputStream createInputStream() 
-            {
-                return new ByteArrayInputStream(photoFileContend);
-            };
-        });
+       /*
+       String currentDirectory = System.getProperty("Images");
+        
+       // Define the relative path to the Java file you want to execute
+       String relativePath = "src\\main\\java\\israela\\image_classification_project\\";
        
-        Image image = new Image(resource, uploadPhoto.getName());
+       // Construct the absolute path
+       String absolutePath = currentDirectory + File.separator + relativePath;
+       System.out.println("\nabsolutePath = "+absolutePath);
+       */
+      String tmp = "tempPhotos"; //getClass().getResource("images").getPath();
         //שמירת התמונה על המחשב
         try {
-            OutputStream out = new FileOutputStream("C:\\Users\\user\\Desktop\\savePhoto\\"+photoIDofMongo+".jpg");
+            OutputStream out = new FileOutputStream(tmp+"\\"+photoIDofMongo+".jpg");
             out.write(photoFileContend);
             out.flush();
             out.close();
@@ -152,370 +165,94 @@ public class UploadPhotoPage extends VerticalLayout{
         } catch (Exception e) {
             System.out.println("OutputStream =====>>"+e.toString());
         }
-        String pathPython = "executable/CNN.py";
-        //String pathPython = "C:\\Users\\user\\Documents\\VSProj\\image_classification_project\\src\\main\\java\\israela\\image_classification_project\\CNN.py";
-        //String pathImage = "C:\\Users\\u  ser\\Desktop\\savePhoto\\"+photoID+".png";
-        String pathImage = "C:\\Users\\user\\Desktop\\savePhoto\\"+photoIDofMongo+".jpg";
-        //String pathImage ="C:\\Users\\user\\Desktop\\savePhoto\\00c5774bc9883453a565f949e4b1e19b.jpg";
-
-        String [] cmd = new String[3];
-        cmd[0] = "python";
-        cmd[1] = pathPython;
-        cmd[2] = pathImage;
-        
-        strPredictions ="";
-        Runtime r = Runtime.getRuntime();
-        System.out.println("Runtime==>>");
-        try {
-            //מייצגת תהליך מערכת
-            //כאשר פקודה מבוצעת באמצעות exec(), היא מחזירה אובייקט Process המייצג את התהליך החדש שנוצר.
-            Process p = r.exec(cmd);
-            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            while((strOfOutpotPhyton=in.readLine()) != null){
-                //Notification.show(strOfOutpotPhyton,10000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                System.out.println("java = "+strOfOutpotPhyton);
-                strPredictions = strOfOutpotPhyton;
-            }
-        } catch (Exception e) {
-            System.out.println("sendToNN ERROR  Process p = r.exec(cmd);===>>"+e.toString());
-        }
-
-        Notification.show(strPredictions, 5000, Position.BOTTOM_START);
-
-        try {
-            double p = Double.parseDouble((String)strPredictions.toString());
-            System.out.println("double = "+p);
-            if(p>50)
-            {
-                //Notification.show("Realism", 5000, Position.BOTTOM_START);
-                strPredictions = "Realism";
-            }
-            else{
-                //Notification.show("Abstract", 5000, Position.BOTTOM_START);
-                strPredictions = "Abstract";
-            }
-
-            strPredicted.add(new H2("The model classified your image into a category: "+strPredictions));
-            //add(strPredicted);
-            if(p>50)
-            {
-                strPredicted.add(new H2("with an accuracy of: "+p));
-            }
-            else{
-                double p2 = 100-p;
-                strPredicted.add(new H2("with an accuracy of: "+p2));
-            }
-            strPredicted.setAlignItems(Alignment.CENTER);
-            add(strPredicted);
-            boolean b =photoService.setClassification(uploadPhoto, strPredictions);
-                if(b==true){
-                    System.out.println("secsses");
-                    //remove(this.photoIDofMongo);
-                    //photoService.addPhoto(uploadPhoto, uploadPhoto.getIdOfUser());
-                }
-                else
-                    System.out.println("not work");
-            
-          
-           
-
-        } catch (Exception e) {
-            System.out.println(e.toString());
-            System.out.println("Cnut convert");
-            System.out.println(strPredictions);
-            }
-
-            File f = new File("C:\\Users\\user\\Desktop\\savePhoto\\"+photoIDofMongo+".jpg");
-            try {
-                f.delete();
-                System.out.println("\n"+f.getName() + " deleted");
-                
-            } catch (Exception e) {
-                System.out.println("\nfailed to deleted the file"+e.toString());
-            }
-
-            notifiLayout.removeAll();
-        
-    }
-    private void sendToCNN2() {
-        if (this.photoIDofMongo == null) {
-            Notification.show("You must upload a photo before sending for evaluation", 10000, Position.TOP_CENTER)
-                    .addThemeVariants(NotificationVariant.LUMO_WARNING);
-            return;
-        }
-    
-        Photo photo = photoService.getPhotoById(this.photoIDofMongo);
-        byte[] photoFileContent = photo.getContend();
-    
-        StreamResource resource = new StreamResource("stam.jpg", () -> new ByteArrayInputStream(photoFileContent));
-    
-        Image image = new Image(resource, photo.getName());
-    
-        try {
-            String outputPath = "C:\\Users\\user\\Desktop\\savePhoto\\" + photoIDofMongo + ".jpg";
-            try (OutputStream out = new FileOutputStream(outputPath)) {
-                out.write(photoFileContent);
-            }
-    
-            System.out.println("File saved successfully at: " + outputPath);
-        } catch (Exception e) {
-            System.out.println("OutputStream error: " + e.toString());
-        }
-    
-        String pathPython = "C:\\Users\\user\\Documents\\VSProj\\milestone2\\src\\main\\java\\israela\\milestone2\\CNN.py";
-        String pathImage = "C:\\Users\\user\\Desktop\\savePhoto\\" + this.photoIDofMongo + ".jpg";
-    
-        Thread t = new Thread(() -> {
-            try {
-                String[] cmd = {"python", pathPython, pathImage};
-                Process process = Runtime.getRuntime().exec(cmd);
-    
-                try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    strPredictions = in.lines().collect(Collectors.joining(System.lineSeparator()));
-                }
-    
-                UI.getCurrent().access(() -> {
-                    Notification.show(strPredictions, 5000, Position.BOTTOM_START);
-    
-                    try {
-                        double p = Double.parseDouble(strPredictions);
-                        String category = (p > 50) ? "Realism" : "Abstract";
-                        double accuracy = (p > 50) ? p : 100 - p;
-    
-                        add(new H2("The model classified your image into a category: " + category));
-                        add(new H2("with an accuracy of: " + accuracy));
-    
-                        Long idUser = Long.parseLong(String.valueOf(VaadinSession.getCurrent().getSession().getAttribute("userId")));
-                        boolean b = photoService.setClassification(uploadPhoto, category);
-    
-                        synchronized (photoIDofMongo) {
-                            photoIDofMongo = photoService.addPhoto(uploadPhoto, idUser);
-                        }
-    
-                        if (b) {
-                            System.out.println("Success");
-                        } else {
-                            System.out.println("Not successful");
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Failed to convert predictions to double: " + strPredictions);
-                    }
-                });
-    
-            } catch (IOException e) {
-                System.out.println("Error executing Python script: " + e.toString());
-            }
-        });
-    
-        t.start();
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            System.out.println("Thread interrupted: " + e.toString());
-            Thread.currentThread().interrupt();
-        }
-    
-        UI.getCurrent().access(() -> {
-            String filePath = "C:\\Users\\user\\Desktop\\savePhoto\\" + this.photoIDofMongo + ".jpg";
-            File fileToDelete = new File(filePath);
-    
-            if (fileToDelete.delete()) {
-                System.out.println(fileToDelete.getName() + " deleted successfully");
-            } else {
-                System.out.println("Failed to delete the file: " + fileToDelete.getName());
-            }
-        });
-}
-
-private void creatPhotoUpload2() {
-
-
-    MemoryBuffer memoryBuffer = new MemoryBuffer();
-    singleFileUpload = new Upload(memoryBuffer);
-    singleFileUpload.setAcceptedFileTypes("image/*");
-
-    singleFileUpload.addSucceededListener(event -> {
-        Notification.show("Photo Upload to Server Succeeded!", 5000, Position.TOP_CENTER);
-
-        try {
-            this.photoFileContend = memoryBuffer.getInputStream().readAllBytes();
-
-            Long idUser = Long.parseLong(String.valueOf(VaadinSession.getCurrent().getSession().getAttribute("userId")));
-            User user = userServise.getUserById(idUser);
-
-            uploadPhoto = new Photo(event.getFileName(), user.getName(), photoFileContend);
-            this.photoIDofMongo = photoService.addPhoto(uploadPhoto, idUser);
-
-            add(new Button("Send to Evaluation", e -> sendToCNN()));
-            add(new Button("Remove Photo", e -> remove(String.valueOf(VaadinSession.getCurrent().getSession().getAttribute("userId")))));
-
-            try {
-                ArrayList<Photo> list = photoService.getPhotoByUserId(idUser);
-                System.out.println("Size of photoUser = " + list.size());
-
-                showPhotoOnPage(uploadPhoto.getContend(), uploadPhoto);
-            } catch (Exception e) {
-                System.out.println("Error retrieving photos from the service: " + e.toString());
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading photo content: " + e.toString());
-            this.photoIDofMongo = null;
-        }
-    });
-}
-    
-
-private void sendToCNN3(){
-
-        if(this.photoIDofMongo==null)
-        {
-            Notification.show("You must upload a photo before sending for evaluation",10000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_WARNING);
-            return;
-        }
-        
-        
-        Photo photo = photoService.getPhotoById(this.photoIDofMongo);
-        System.out.println("sendToNN==>>"+photo.getName());
-        byte[] photoFileContend = photo.getContend();
-        System.out.println("========================>>"+photoFileContend.toString());
-       // Notification.show("The model start working",5000, Position.TOP_CENTER);
-        StreamResource resource = new StreamResource("stam.jpg", new InputStreamFactory() 
-        {
-            public java.io.InputStream createInputStream() 
-            {
-                return new ByteArrayInputStream(photoFileContend);
-            };
-        });
        
-        Image image = new Image(resource, photo.getName());
-        try {
-            OutputStream out = new FileOutputStream("C:\\Users\\user\\Desktop\\savePhoto\\"+photoIDofMongo+".jpg");
-            out.write(photoFileContend);
-            out.flush();
-            out.close();
-            
-            System.out.println("YESSSSSSSSSSSSS");
-        } catch (Exception e) {
-            System.out.println("OutputStream =====>>"+e.toString());
-        }
-        
-        
-        String pathPython = "C:\\Users\\user\\Documents\\VSProj\\milestone2\\src\\main\\java\\israela\\milestone2\\CNN.py";
-        //String pathImage = "C:\\Users\\user\\Desktop\\savePhoto\\"+photoID+".png";
-        String pathImage = "C:\\Users\\user\\Desktop\\savePhoto\\"+photoIDofMongo+".jpg";
+        System.out.println("tmp = "+tmp);
+        String pathPython = "src\\main\\java\\israela\\image_classification_project\\CNN.py";
+        //String pathPython = "C:\\Users\\user\\Documents\\VSProj\\image_classification_project\\src\\main\\java\\israela\\image_classification_project\\CNN.py";
+        String pathImage = tmp+"\\"+photoIDofMongo+".jpg";
+        //System.out.println("src\\main\\resources\\META-INF\\resources\\images\\"+photoIDofMongo+".jpg");
+        //String pathImage = "C:\\Users\\user\\Desktop\\savePhoto\\"+photoIDofMongo+".jpg";
         //String pathImage ="C:\\Users\\user\\Desktop\\savePhoto\\00c5774bc9883453a565f949e4b1e19b.jpg";
+        startLongTask(pathPython,pathImage);
+        // String [] cmd = new String[3];
+        // cmd[0] = "python";
+        // cmd[1] = pathPython;
+        // cmd[2] = pathImage;
         
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-               // Notification.show("The model start working2",5000, Position.TOP_CENTER);
+        // strPredictions ="";
+        // Runtime r = Runtime.getRuntime();
+        // System.out.println("Runtime==>>");
+        // try {
+        //     //מייצגת תהליך מערכת
+        //     //כאשר פקודה מבוצעת באמצעות exec(), היא מחזירה אובייקט Process המייצג את התהליך החדש שנוצר.
+        //     Process p = r.exec(cmd);
+        //     BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        //     while((strOfOutpotPhyton=in.readLine()) != null){
+        //         //Notification.show(strOfOutpotPhyton,10000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+        //         System.out.println("java = "+strOfOutpotPhyton);
+        //         strPredictions = strOfOutpotPhyton;
+        //     }
+        // } catch (Exception e) {
+        //     System.out.println("sendToNN ERROR  Process p = r.exec(cmd);===>>"+e.toString());
+        // }
+
+        //Notification.show(strPredictions, 5000, Position.BOTTOM_START);
+
+        // try {
+        //     double d = Double.parseDouble((String)strPredictions.toString());
+        //     System.out.println("double = "+d);
+        //     if(d>50)
+        //     {
+        //         //Notification.show("Realism", 5000, Position.BOTTOM_START);
+        //         strPredictions = "Realism";
+        //     }
+        //     else{
+        //         //Notification.show("Abstract", 5000, Position.BOTTOM_START);
+        //         strPredictions = "Abstract";
+        //     }
+        //     H1 h1 = new H1(strPredictions);
+        //     h1.getStyle().setColor("green");
+        //     strPredictedVerticalLayout.add(h1);
+        //     strPredictedVerticalLayout.add(new H2("The model classified your image into a category: "+strPredictions));
+        //     //add(strPredicted);
+        //     if(d>50)
+        //     {
+        //         strPredictedVerticalLayout.add(new H2("with an accuracy of: "+d));
+        //     }
+        //     else{
+        //         double p2 = 100-d;
+        //         strPredictedVerticalLayout.add(new H2("with an accuracy of: "+p2));
+        //     }
+        //     strPredictedVerticalLayout.setAlignItems(Alignment.CENTER);
+        //     add(strPredictedVerticalLayout);
+
+        //     try {
+        //         boolean b =photoService.setClassification(uploadPhoto, strPredictions);
+        //         if(b==true)
+        //             System.out.println("secsses");
                 
-                String [] cmd = new String[3];
-                cmd[0] = "python";
-                cmd[1] = pathPython;
-                cmd[2] = pathImage;
-        
+        //     } catch (Exception e) {
+        //         System.out.println("\nError is send to CNN==> setClassification=>"+e.toString());
+        //     }
+
+        // } catch (Exception e) {
+        //     System.out.println(e.toString());
+        //     System.out.println("Cnut convert");
+        //     System.out.println(strPredictions);
+        //     }
+
+        //     File f = new File(tmp+"\\"+photoIDofMongo+".jpg");
+        //     try {   
+        //         f.delete();
+        //         System.out.println("\n"+f.getName() + " deleted");
                 
-                strPredictions ="";
-                Runtime r = Runtime.getRuntime();
-                System.out.println("Runtime==>>");
-                try {
-                    Process p = r.exec(cmd);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                    while((strOfOutpotPhyton=in.readLine()) != null){
-                        //Notification.show(strOfOutpotPhyton,10000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                        System.out.println("java = "+strOfOutpotPhyton);
-                        strPredictions = strOfOutpotPhyton;
-                    }
-                } catch (Exception e) {
-                    System.out.println("sendToNN ERROR  Process p = r.exec(cmd);===>>"+e.toString());
-                }
-        
-                Notification.show(strPredictions, 5000, Position.BOTTOM_START);
-        
-                
-            }
-            });
-            try {
-                t.start();
-                
-            t.join();
-            try {
-                double p = Double.parseDouble((String)strPredictions.toString());
-                System.out.println("double = "+p);
-                if(p>50)
-                {
-                    strPredictions = "Realism";
-                }
-                else{
-                    strPredictions = "Abstract";
-                }
-    
-                add(new H2("The model classified your image into a category: "+strPredictions));
-                if(p>50)
-                {
-                    add(new H2("with an accuracy of: "+p));
-                }
-                else{
-                    double p2 = 100-p;
-                    add(new H2("with an accuracy of: "+p2));
-                }
-                Long idUser = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
-                boolean b =photoService.setClassification(uploadPhoto, strPredictions);
-                
-                if(b==true){
-                        System.out.println("secsses");
-    
-                        // Long idUser = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
-                        
-                        // this.photoIDofMongo = photoService.addPhoto(uploadPhoto, idUser);
-    
-                        // if(this.photoIDofMongo!=null)
-                        // {
-                        //     Notification.show("Photo Upload to Server Succeeded!", 5000, Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);;
-                        // }
-                        // else
-                        // {
-                        //     Notification.show("Photo Failde Upload to Server", 5000, Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_ERROR);;
-                        // }
-                        //remove(this.photoIDofMongo);
-                        //photoService.addPhoto(uploadPhoto, uploadPhoto.getIdOfUser());
-                        //Long idUser = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
-                        
-                        //uploadPhoto = new Photo("event.getFileName()", "user.getName()", photoFileContend);
-                        //this.photoIDofMongo = photoService.addPhoto(uploadPhoto, idUser);
-                    }
-                    else
-                        System.out.println("not work");
-                
-              
-               
-    
-            } catch (Exception e) {
-                System.out.println(e.toString());
-                System.out.println("Cnut convert");
-                System.out.println(strPredictions);
-                }
-        
-            
-            File f = new File("C:\\Users\\user\\Desktop\\savePhoto\\"+this.photoIDofMongo+".jpg");
-            if(f.delete())
-            {
-                System.out.println("\n"+f.getName() + " deleted");
-            }
-            else{
-                System.out.println("\nfailed to deleted the file"); 
-            }
-                
-            } catch (Exception e) {
-                System.out.println("NOT WORK ==>>"+e.toString());
-            }
-            
-            
-        
+        //     } catch (Exception e) {
+        //         System.out.println("\nfailed to deleted the file"+e.toString());
+        //     }
+
+        //     notifiLayout.removeAll();
         
     }
-
     private void creatPhotoUpload() {
 
         
@@ -529,7 +266,7 @@ private void sendToCNN3(){
 
         singleFileUpload.addSucceededListener(event -> {
             photoAndBtnLayout.removeAll();
-            strPredicted.removeAll();
+            strPredictedVerticalLayout.removeAll();
             Notification.show("Photo Upload to Server Succeeded!", 5000, Position.BOTTOM_START);
 
             System.out.println("File name: "+event.getFileName());
@@ -546,24 +283,32 @@ private void sendToCNN3(){
 
                 uploadPhoto = new Photo(event.getFileName(), user.getName(), photoFileContend);
                 this.photoIDofMongo = photoService.addPhoto(uploadPhoto, idUser);
-                btnLayout.add(new Button("Send to model", e -> {
-                    notifiay();
-
-                    Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //System.out.println("UI.getCurrent()= "+UI.getCurrent().getId());
-                            ui.access(() -> sendToCNN());
-                        }
+                Button btnSendToModel = new Button("Send to model", e -> {
+                    //notifiay();
+                    sendToCNN();
+                    //startLongTask();
+                    
+                    // Thread t = new Thread(new Runnable() {
+                    //     @Override
+                    //     public void run() {
+                    //         //System.out.println("UI.getCurrent()= "+UI.getCurrent().getId());
+                    //         ui.access(() -> sendToCNN());
+                    //     }
 
                     
-                    });
-                    t.start();
+                    // });
+                    // t.start();
 
                     
-                }));
+                });
+                btnSendToModel.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+                btnLayout.add(btnSendToModel);
+                Button btnRemovePhoto = new Button("Remove Photo", e -> remove((String)VaadinSession.getCurrent().getSession().getAttribute("userId")));
+                Button btnTestMsg = new Button("Test Msg", e -> notifiay());
+                btnRemovePhoto.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+                btnLayout.add(btnRemovePhoto);
+                btnLayout.add(btnTestMsg);
                 
-                btnLayout.add(new Button("Remove Photo", e -> remove((String)VaadinSession.getCurrent().getSession().getAttribute("userId"))));
                 //add(btnLayout);
                 photoAndBtnLayout.add(btnLayout);
                
@@ -593,8 +338,11 @@ private void sendToCNN3(){
     
     private void notifiay() {
         
-        String zzzString = "The model is calculating, please wait";
-        Notification.show(zzzString,5000,Position.TOP_CENTER);
+        H3 zzzString = new H3("The model is calculating, please wait.");
+        //Notification.show(zzzString,5000,Position.TOP_CENTER);
+        strPredictedVerticalLayout.add(zzzString);
+        strPredictedVerticalLayout.setAlignItems(Alignment.CENTER);
+        add(strPredictedVerticalLayout);
         //verticalLayout.add(zzzString);
         setAlignItems(Alignment.CENTER);
 
@@ -626,5 +374,164 @@ private void sendToCNN3(){
         return (userName == null) ? false : true;
     }
 
+    // private void startLongTask(String pathPython, String pathImage)
+    // {
+    //     try {
+    //         strPredictions =  this.uploadPhotoServise.doLongTask1(10,pathPython, pathImage);
+            
+    //     } catch (Exception e) {
+    //         System.out.println("ERROR in startLongTask==>> "+e.toString());
+    //     }
+        
+    //     LongTasklistener
+    //    longTaskThread = this.uploadPhotoServise.doLongTask1(10,pathPython, pathImage,new LongTasklistener()
+    //    {
+ 
+    //       @Override
+    //       public void onStart(String msg)
+    //       {
+    //          updateUI(msg);
+    //       }
+ 
+    //       @Override
+    //       public void onUpdate(String msg)
+    //       {
+    //          updateUI(msg);
+    //       }
+ 
+    //       @Override
+    //       public void onInterupt(String msg)
+    //       {
+    //          updateUI(msg);
+    //       }
+ 
+    //       @Override
+    //       public void onFinish(String msg)
+    //       {
+    //          updateUIOnFinish(msg);
+ 
+    //         //  UI ui = getUI().orElseThrow();
+    //         //  ui.access(() -> {
+    //         //     btnCancel.setEnabled(false);
+    //         //     btnStart.setEnabled(true);
+    //         //  });
+    //       }
+        
+        
+    
 
+
+        
+    //    });
+    // }
+    private void startLongTask(String pathPython, String pathImage)
+   {
+      longTaskThread = uploadPhotoServise.doLongTask1(10, pathPython, pathImage,new LongTasklistener()
+      {
+
+         @Override
+         public void onStart(String msg)
+         {
+            updateUI(msg);
+         }
+
+         @Override
+         public void onUpdate(String msg)
+         {
+            updateUI(msg);
+         }
+
+         @Override
+         public void onInterupt(String msg)
+         {
+            updateUI(msg);
+         }
+
+         @Override
+         public void onFinish(String msg)
+         {
+            ui.access(() ->updateUIOnFinish(msg));
+
+            // UI ui = getUI().orElseThrow();
+            // ui.access(() -> {
+            //    btnCancel.setEnabled(false);
+            //    btnStart.setEnabled(true);
+            // });
+         }
+
+      });
+      longTaskThread.start();
+    //   btnCancel.setEnabled(true);
+    //   btnStart.setEnabled(false);
+   }
+
+    private void updateUI(String msg)
+   {
+      UI ui = getUI().orElseThrow();
+      //ui.access(() -> logMsgArea.setValue(logMsgArea.getValue() + "\n" + msg));
+      ui.access(() -> notifiay());
+   }
+
+   private void updateUIOnFinish(String msg) {
+    strPredictedVerticalLayout.removeAll();
+    String tmp = "tempPhotos";
+    strPredictions = msg;
+
+    try {
+        
+        double d = Double.parseDouble((String)strPredictions.toString());
+        System.out.println("double = "+d);
+        if(d>50)
+        {
+            //Notification.show("Realism", 5000, Position.BOTTOM_START);
+            strPredictions = "Realism";
+        }
+        else{
+            //Notification.show("Abstract", 5000, Position.BOTTOM_START);
+            strPredictions = "Abstract";
+        }
+        H1 h1 = new H1(strPredictions);
+        h1.getStyle().setColor("green");
+        strPredictedVerticalLayout.add(h1);
+        strPredictedVerticalLayout.add(new H2("The model classified your image into a category: "+strPredictions));
+        //add(strPredicted);
+        if(d>50)
+        {
+            strPredictedVerticalLayout.add(new H2("with an accuracy of: "+d));
+        }
+        else{
+            double p2 = 100-d;
+            strPredictedVerticalLayout.add(new H2("with an accuracy of: "+p2));
+        }
+        strPredictedVerticalLayout.setAlignItems(Alignment.CENTER);
+        add(strPredictedVerticalLayout);
+
+        try {
+            boolean b =photoService.setClassification(uploadPhoto, strPredictions);
+            if(b==true)
+                System.out.println("secsses");
+            
+        } catch (Exception e) {
+            System.out.println("\nError is send to CNN==> setClassification=>"+e.toString());
+        }
+
+    } catch (Exception e) {
+        System.out.println(e.toString());
+        System.out.println("Cnut convert");
+        System.out.println(strPredictions);
+        }
+
+        File f = new File(tmp+"\\"+photoIDofMongo+".jpg");
+        try {   
+            f.delete();
+            System.out.println("\n"+f.getName() + " deleted");
+            
+        } catch (Exception e) {
+            System.out.println("\nfailed to deleted the file"+e.toString());
+        }
+
+        notifiLayout.removeAll();
+            
+   }
+ 
 }
