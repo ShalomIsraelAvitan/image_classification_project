@@ -31,7 +31,7 @@ public class UploadPhotoServise {
    }
 
 
-    public Thread doLongTask1(int seconds, String pathPython, String pathImage, LongTasklistener listener)
+    public Thread doLongTask1(String pathPython, String pathImage, LongTasklistener listener)
    {
       Thread thread = new Thread(new Runnable()
       {

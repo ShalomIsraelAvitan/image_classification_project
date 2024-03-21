@@ -1,15 +1,10 @@
 package israela.image_classification_project;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -32,10 +27,6 @@ import com.vaadin.flow.server.VaadinSession;
 
 import israela.image_classification_project.UploadPhotoServise.LongTasklistener;
 
-//import israela.image_classification_project.UploadPhotoServise.LongTasklistener;
-
-//import py4j.GatewayServer;
-//from py4j.java_gateway import JavaGateway;
 
 @Route(value = "/upload", layout = AppMainLayout.class)
 public class UploadPhotoPage extends VerticalLayout{
@@ -45,7 +36,6 @@ public class UploadPhotoPage extends VerticalLayout{
     private String photoIDofMongo;
     private UploadPhotoServise uploadPhotoServise;
 
-    private String strOfOutpotPhyton;
     private byte[] photoFileContend; 
     private UserServise userServise;
 
@@ -142,18 +132,8 @@ public class UploadPhotoPage extends VerticalLayout{
         System.out.println("sendToNN==>>"+photo.getName());
         byte[] photoFileContend = uploadPhoto.getContend();
         System.out.println("========================>>"+photoFileContend.toString());
-       // Notification.show("The model start working",5000, Position.TOP_CENTER);
-       /*
-       String currentDirectory = System.getProperty("Images");
-        
-       // Define the relative path to the Java file you want to execute
-       String relativePath = "src\\main\\java\\israela\\image_classification_project\\";
        
-       // Construct the absolute path
-       String absolutePath = currentDirectory + File.separator + relativePath;
-       System.out.println("\nabsolutePath = "+absolutePath);
-       */
-      String tmp = "tempPhotos"; //getClass().getResource("images").getPath();
+        String tmp = "tempPhotos";
         //שמירת התמונה על המחשב
         try {
             OutputStream out = new FileOutputStream(tmp+"\\"+photoIDofMongo+".jpg");
@@ -166,97 +146,14 @@ public class UploadPhotoPage extends VerticalLayout{
             System.out.println("OutputStream =====>>"+e.toString());
         }
        
-        System.out.println("tmp = "+tmp);
         String pathPython = "src\\main\\java\\israela\\image_classification_project\\CNN.py";
-        //String pathPython = "C:\\Users\\user\\Documents\\VSProj\\image_classification_project\\src\\main\\java\\israela\\image_classification_project\\CNN.py";
         String pathImage = tmp+"\\"+photoIDofMongo+".jpg";
-        //System.out.println("src\\main\\resources\\META-INF\\resources\\images\\"+photoIDofMongo+".jpg");
-        //String pathImage = "C:\\Users\\user\\Desktop\\savePhoto\\"+photoIDofMongo+".jpg";
-        //String pathImage ="C:\\Users\\user\\Desktop\\savePhoto\\00c5774bc9883453a565f949e4b1e19b.jpg";
-        startLongTask(pathPython,pathImage);
-        // String [] cmd = new String[3];
-        // cmd[0] = "python";
-        // cmd[1] = pathPython;
-        // cmd[2] = pathImage;
         
-        // strPredictions ="";
-        // Runtime r = Runtime.getRuntime();
-        // System.out.println("Runtime==>>");
-        // try {
-        //     //מייצגת תהליך מערכת
-        //     //כאשר פקודה מבוצעת באמצעות exec(), היא מחזירה אובייקט Process המייצג את התהליך החדש שנוצר.
-        //     Process p = r.exec(cmd);
-        //     BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        //     while((strOfOutpotPhyton=in.readLine()) != null){
-        //         //Notification.show(strOfOutpotPhyton,10000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-        //         System.out.println("java = "+strOfOutpotPhyton);
-        //         strPredictions = strOfOutpotPhyton;
-        //     }
-        // } catch (Exception e) {
-        //     System.out.println("sendToNN ERROR  Process p = r.exec(cmd);===>>"+e.toString());
-        // }
-
-        //Notification.show(strPredictions, 5000, Position.BOTTOM_START);
-
-        // try {
-        //     double d = Double.parseDouble((String)strPredictions.toString());
-        //     System.out.println("double = "+d);
-        //     if(d>50)
-        //     {
-        //         //Notification.show("Realism", 5000, Position.BOTTOM_START);
-        //         strPredictions = "Realism";
-        //     }
-        //     else{
-        //         //Notification.show("Abstract", 5000, Position.BOTTOM_START);
-        //         strPredictions = "Abstract";
-        //     }
-        //     H1 h1 = new H1(strPredictions);
-        //     h1.getStyle().setColor("green");
-        //     strPredictedVerticalLayout.add(h1);
-        //     strPredictedVerticalLayout.add(new H2("The model classified your image into a category: "+strPredictions));
-        //     //add(strPredicted);
-        //     if(d>50)
-        //     {
-        //         strPredictedVerticalLayout.add(new H2("with an accuracy of: "+d));
-        //     }
-        //     else{
-        //         double p2 = 100-d;
-        //         strPredictedVerticalLayout.add(new H2("with an accuracy of: "+p2));
-        //     }
-        //     strPredictedVerticalLayout.setAlignItems(Alignment.CENTER);
-        //     add(strPredictedVerticalLayout);
-
-        //     try {
-        //         boolean b =photoService.setClassification(uploadPhoto, strPredictions);
-        //         if(b==true)
-        //             System.out.println("secsses");
-                
-        //     } catch (Exception e) {
-        //         System.out.println("\nError is send to CNN==> setClassification=>"+e.toString());
-        //     }
-
-        // } catch (Exception e) {
-        //     System.out.println(e.toString());
-        //     System.out.println("Cnut convert");
-        //     System.out.println(strPredictions);
-        //     }
-
-        //     File f = new File(tmp+"\\"+photoIDofMongo+".jpg");
-        //     try {   
-        //         f.delete();
-        //         System.out.println("\n"+f.getName() + " deleted");
-                
-        //     } catch (Exception e) {
-        //         System.out.println("\nfailed to deleted the file"+e.toString());
-        //     }
-
-        //     notifiLayout.removeAll();
+        startLongTask(pathPython,pathImage);
         
     }
     private void creatPhotoUpload() {
 
-        
-        //photoAndBtnLayout = new VerticalLayout();
         /* Example for MemoryBuffer */
         ui = UI.getCurrent();
         MemoryBuffer memoryBuffer = new MemoryBuffer();//מאגר נתונים (או סתם מאגר) הוא אזור בזיכרון המשמש לאחסון נתונים באופן זמני בזמן שהם מועברים ממקום אחד לאחר
@@ -283,24 +180,7 @@ public class UploadPhotoPage extends VerticalLayout{
 
                 uploadPhoto = new Photo(event.getFileName(), user.getName(), photoFileContend);
                 this.photoIDofMongo = photoService.addPhoto(uploadPhoto, idUser);
-                Button btnSendToModel = new Button("Send to model", e -> {
-                    //notifiay();
-                    sendToCNN();
-                    //startLongTask();
-                    
-                    // Thread t = new Thread(new Runnable() {
-                    //     @Override
-                    //     public void run() {
-                    //         //System.out.println("UI.getCurrent()= "+UI.getCurrent().getId());
-                    //         ui.access(() -> sendToCNN());
-                    //     }
-
-                    
-                    // });
-                    // t.start();
-
-                    
-                });
+                Button btnSendToModel = new Button("Send to model", e -> sendToCNN());
                 btnSendToModel.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
                 btnLayout.add(btnSendToModel);
                 Button btnRemovePhoto = new Button("Remove Photo", e -> remove((String)VaadinSession.getCurrent().getSession().getAttribute("userId")));
@@ -309,16 +189,14 @@ public class UploadPhotoPage extends VerticalLayout{
                 btnLayout.add(btnRemovePhoto);
                 btnLayout.add(btnTestMsg);
                 
-                //add(btnLayout);
                 photoAndBtnLayout.add(btnLayout);
                
-                //showPhotoOnPage(photoFileContend, uploadPhoto);
                 try{
                 ArrayList<Photo> list = photoService.getPhotoByUserId(idUser);
                 System.out.println("*****************************");
                 System.out.println("Size of photoUser = "+list.size());
                 System.out.println("*****************************\n");
-                //showPhotoOnPage(list.get(list.size()-1).getContend(), uploadPhoto);
+
                 showPhotoOnPage(uploadPhoto.getContend(), uploadPhoto);
                 photoAndBtnLayout.setAlignItems(Alignment.CENTER);
                 add(photoAndBtnLayout);
@@ -338,9 +216,9 @@ public class UploadPhotoPage extends VerticalLayout{
     
     private void notifiay() {
         
-        H3 zzzString = new H3("The model is calculating, please wait.");
-        //Notification.show(zzzString,5000,Position.TOP_CENTER);
-        strPredictedVerticalLayout.add(zzzString);
+        H3 str = new H3("The model is calculating, please wait.");
+
+        strPredictedVerticalLayout.add(str);
         strPredictedVerticalLayout.setAlignItems(Alignment.CENTER);
         add(strPredictedVerticalLayout);
         //verticalLayout.add(zzzString);
@@ -361,7 +239,7 @@ public class UploadPhotoPage extends VerticalLayout{
         Image image = new Image(resource, uploadPhotoo.getName());
         image.setHeight("200px");
         image.setWidth("200px");
-        //add(image);
+
         photoAndBtnLayout.add(image);
   
     }
@@ -374,59 +252,9 @@ public class UploadPhotoPage extends VerticalLayout{
         return (userName == null) ? false : true;
     }
 
-    // private void startLongTask(String pathPython, String pathImage)
-    // {
-    //     try {
-    //         strPredictions =  this.uploadPhotoServise.doLongTask1(10,pathPython, pathImage);
-            
-    //     } catch (Exception e) {
-    //         System.out.println("ERROR in startLongTask==>> "+e.toString());
-    //     }
-        
-    //     LongTasklistener
-    //    longTaskThread = this.uploadPhotoServise.doLongTask1(10,pathPython, pathImage,new LongTasklistener()
-    //    {
- 
-    //       @Override
-    //       public void onStart(String msg)
-    //       {
-    //          updateUI(msg);
-    //       }
- 
-    //       @Override
-    //       public void onUpdate(String msg)
-    //       {
-    //          updateUI(msg);
-    //       }
- 
-    //       @Override
-    //       public void onInterupt(String msg)
-    //       {
-    //          updateUI(msg);
-    //       }
- 
-    //       @Override
-    //       public void onFinish(String msg)
-    //       {
-    //          updateUIOnFinish(msg);
- 
-    //         //  UI ui = getUI().orElseThrow();
-    //         //  ui.access(() -> {
-    //         //     btnCancel.setEnabled(false);
-    //         //     btnStart.setEnabled(true);
-    //         //  });
-    //       }
-        
-        
-    
-
-
-        
-    //    });
-    // }
     private void startLongTask(String pathPython, String pathImage)
    {
-      longTaskThread = uploadPhotoServise.doLongTask1(10, pathPython, pathImage,new LongTasklistener()
+      longTaskThread = uploadPhotoServise.doLongTask1(pathPython, pathImage,new LongTasklistener()
       {
 
          @Override
