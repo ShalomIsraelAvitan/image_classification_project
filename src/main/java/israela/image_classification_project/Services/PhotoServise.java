@@ -1,4 +1,4 @@
-package israela.image_classification_project;
+package israela.image_classification_project.Services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,9 @@ import java.util.Optional;
 import org.bson.types.ObjectId;
 
 import org.springframework.stereotype.Service;
+
+import israela.image_classification_project.Photo;
+import israela.image_classification_project.Repositorys.PhotoReposiory;
 
 @Service
 public class PhotoServise {

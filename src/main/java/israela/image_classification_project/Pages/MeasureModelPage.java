@@ -1,4 +1,4 @@
-package israela.image_classification_project;
+package israela.image_classification_project.Pages;
 
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
@@ -7,6 +7,8 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
+
+import israela.image_classification_project.AppMainLayout;
 @Route(value = "/measuremodel", layout = AppMainLayout.class)
 public class MeasureModelPage extends VerticalLayout {
 

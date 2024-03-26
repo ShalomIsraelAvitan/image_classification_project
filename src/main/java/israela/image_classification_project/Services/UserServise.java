@@ -1,9 +1,12 @@
-package israela.image_classification_project;
+package israela.image_classification_project.Services;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+
+import israela.image_classification_project.User;
+import israela.image_classification_project.Repositorys.UserRepository;
 
 @Service
 public class UserServise {

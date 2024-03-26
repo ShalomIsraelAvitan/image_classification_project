@@ -1,7 +1,6 @@
-package israela.image_classification_project;
+package israela.image_classification_project.Pages;
 
 import java.io.ByteArrayInputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -9,7 +8,6 @@ import java.util.ArrayList;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -19,6 +17,12 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.InputStreamFactory;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
+
+
+import israela.image_classification_project.AppMainLayout;
+import israela.image_classification_project.Photo;
+import israela.image_classification_project.Services.*;
+import israela.image_classification_project.User;
 
 //@Route(value = "/allphotos",layout = AppMainLayout.class)
 @Route (value = "/allphotos", layout = AppMainLayout.class)

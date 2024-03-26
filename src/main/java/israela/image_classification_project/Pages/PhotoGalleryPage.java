@@ -1,4 +1,4 @@
-package israela.image_classification_project;
+package israela.image_classification_project.Pages;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -18,6 +18,10 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.InputStreamFactory;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
+
+import israela.image_classification_project.AppMainLayout;
+import israela.image_classification_project.Photo;
+import israela.image_classification_project.Services.PhotoServise;
 
 @Route(value = "/gallery", layout = AppMainLayout.class)
 public class PhotoGalleryPage extends VerticalLayout{

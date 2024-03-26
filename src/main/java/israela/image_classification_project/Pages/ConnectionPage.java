@@ -1,4 +1,4 @@
-package israela.image_classification_project;
+package israela.image_classification_project.Pages;
 
 import java.util.Date;
 
@@ -17,6 +17,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+
+import israela.image_classification_project.AppMainLayout;
+import israela.image_classification_project.Services.UserServise;
 
 @Route(value = "/Connection", layout = AppMainLayout.class)
 @PageTitle("Connection")

@@ -1,5 +1,5 @@
-package israela.image_classification_project;
 
+package israela.image_classification_project.Pages;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -24,7 +24,12 @@ import com.vaadin.flow.server.InputStreamFactory;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
 
-import israela.image_classification_project.UserServise.UserGridChangeListener;
+import israela.image_classification_project.AppMainLayout;
+import israela.image_classification_project.Photo;
+
+import israela.image_classification_project.Services.*;
+import israela.image_classification_project.Services.UserServise.UserGridChangeListener;
+import israela.image_classification_project.User;
 
 
 

@@ -1,5 +1,4 @@
 package israela.image_classification_project;
-
 import org.springframework.boot.logging.logback.ColorConverter;
 
 import com.vaadin.flow.component.UI;
@@ -15,6 +14,10 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+
+import israela.image_classification_project.Pages.*;
+import israela.image_classification_project.Services.UserServise;
+
 
 public class AppMainLayout extends AppLayout
 {

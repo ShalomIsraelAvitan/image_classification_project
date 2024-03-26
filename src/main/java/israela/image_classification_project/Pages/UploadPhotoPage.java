@@ -1,4 +1,4 @@
-package israela.image_classification_project;
+package israela.image_classification_project.Pages;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -25,7 +25,13 @@ import com.vaadin.flow.server.InputStreamFactory;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
 
-import israela.image_classification_project.UploadPhotoServise.LongTasklistener;
+import israela.image_classification_project.AppMainLayout;
+import israela.image_classification_project.Photo;
+import israela.image_classification_project.User;
+import israela.image_classification_project.Services.PhotoServise;
+import israela.image_classification_project.Services.UploadPhotoServise;
+import israela.image_classification_project.Services.UserServise;
+import israela.image_classification_project.Services.UploadPhotoServise.LongTasklistener;
 
 
 @Route(value = "/upload", layout = AppMainLayout.class)

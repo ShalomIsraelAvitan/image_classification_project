@@ -1,4 +1,4 @@
-package israela.image_classification_project;
+package israela.image_classification_project.Services;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

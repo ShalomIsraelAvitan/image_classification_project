@@ -1,4 +1,4 @@
-package israela.image_classification_project;
+package israela.image_classification_project.Pages;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -13,6 +13,9 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
+
+import israela.image_classification_project.User;
+import israela.image_classification_project.Services.UserServise;
 
 @Route(value = "/signup")
 @PageTitle("signup")
