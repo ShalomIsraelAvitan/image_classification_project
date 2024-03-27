@@ -2,6 +2,7 @@ package israela.image_classification_project.Pages;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -47,7 +48,9 @@ public class SignUpPage extends VerticalLayout{
         fieldsPanel.add(fieldId,fieldName,fieldPw);
         fieldsPanel.add(new Button("SignUp", e -> SignUp(fieldId,fieldName,fieldPw)));
         fieldsPanel.setAlignItems(Alignment.CENTER);
+        add(new H1("Welcome to SignUp page"));
         add(fieldsPanel);
+        setAlignItems(Alignment.CENTER);
     
         
     }

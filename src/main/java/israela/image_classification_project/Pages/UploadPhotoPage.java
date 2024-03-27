@@ -190,10 +190,10 @@ public class UploadPhotoPage extends VerticalLayout{
                 btnSendToModel.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
                 btnLayout.add(btnSendToModel);
                 Button btnRemovePhoto = new Button("Remove Photo", e -> remove((String)VaadinSession.getCurrent().getSession().getAttribute("userId")));
-                Button btnTestMsg = new Button("Test Msg", e -> notifiay());
+                Button btnTestMsg = new Button("Test Msg", e -> notifiay2());
                 btnRemovePhoto.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
                 btnLayout.add(btnRemovePhoto);
-                btnLayout.add(btnTestMsg);
+                //btnLayout.add(btnTestMsg);
                 
                 photoAndBtnLayout.add(btnLayout);
                
@@ -220,6 +220,10 @@ public class UploadPhotoPage extends VerticalLayout{
         
     }
     
+    private void notifiay2() {
+        Notification.show("The model is calculating, please wait.",5000,Position.TOP_CENTER);
+    }
+
     private void notifiay() {
         
         H3 str = new H3("The model is calculating, please wait.");

@@ -15,21 +15,23 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 import israela.image_classification_project.AppMainLayout;
+import israela.image_classification_project.User;
 import israela.image_classification_project.Services.PhotoServise;
+import israela.image_classification_project.Services.UserServise;
 
 @Route(value = "/",layout = AppMainLayout.class)
 @PageTitle("Home")
 public class HomePage extends VerticalLayout{
 
-
-    private String userName;
-
+    private UserServise userServise;
+    
     private static final String IMAGE_URL = "https://www.smorescience.com/wp-content/uploads/2023/08/Featured-Images-50.jpg";
-    public  HomePage(PhotoServise photoService) {
+    public  HomePage(UserServise userServise) {
     setAlignItems(Alignment.CENTER);
+    this.userServise = userServise;
 
     // Get from Session the 'username' attribute 
-    userName = (String)VaadinSession.getCurrent().getSession().getAttribute("username");
+    String userName = (String)VaadinSession.getCurrent().getSession().getAttribute("username");
 
       // if no 'username' attribute, this is a Guest.
       String welcomeMsg = null;
@@ -43,13 +45,13 @@ public class HomePage extends VerticalLayout{
       
 
       add(new H2("Home Page"));
-      creatInformationForUser(welcomeMsg);
+      creatInformationForUser(welcomeMsg,userName);
 
       // set all components in the Center of page
       setSizeFull();
       setAlignItems(Alignment.CENTER);
    }
-   private void creatInformationForUser(String welcomeMsg) {
+   private void creatInformationForUser(String welcomeMsg,String userName) {
 
       Image imgLogo = new Image(IMAGE_URL, "Home image");
       imgLogo.setHeight("250px");
@@ -87,21 +89,26 @@ public class HomePage extends VerticalLayout{
         horizontalLayout2.add(new H3(str3));
         add(horizontalLayout2);
 
-        addAdminGuidelines((String)VaadinSession.getCurrent().getSession().getAttribute("username"));
+        addAdminGuidelines(userName);
 
     }
     private void addAdminGuidelines(String userName) {
         if(userName==null)
             return;
-        String str = "If you would like to enter your Admin page, you can click on the";
-        H3 h = new H3("Admin");
-        h.getStyle().setColor("blue");
-        String str2 = "button, located in the navigation bar on the top left.";
+        
+        Long idUser = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
+        User user = userServise.getUserById(idUser);
+        if(user.getAdmin()){
+            String str = "If you would like to enter your Admin page, you can click on the";
+            H3 h = new H3("Admin");
+            h.getStyle().setColor("blue");
+            String str2 = "button, located in the navigation bar on the top left.";
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout();
-        horizontalLayout.add(new H3(str));
-        horizontalLayout.add(h);
-        horizontalLayout.add(new H3(str2));
-        add(horizontalLayout);
+            HorizontalLayout horizontalLayout = new HorizontalLayout();
+            horizontalLayout.add(new H3(str));
+            horizontalLayout.add(h);
+            horizontalLayout.add(new H3(str2));
+            add(horizontalLayout);
+        }
     }
 }
