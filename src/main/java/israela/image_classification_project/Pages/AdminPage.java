@@ -37,32 +37,20 @@ import israela.image_classification_project.User;
 @PageTitle("admin")
 public class AdminPage extends VerticalLayout{
     private Grid<User> gridUser;
-    //private Grid<Photo> gridPhotoUser;
     private PhotoServise photoServise;
     private String userName;
     private UserServise userServise;
     private VerticalLayout verLayout;
 
     private User userChos;
+
     public AdminPage(PhotoServise photoServise, UserServise userServise)
     {
         this.userServise = userServise;
         this.photoServise = photoServise;
-        setAlignItems(Alignment.CENTER);
+
         userChos = new User(null, null, 0);
 
-        Long idOfUser = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
-        boolean res = photoServise.removePhotoWithoutClassification(idOfUser, "Null classification");
-        if(res==true)
-        {
-            System.out.println("Uncategorized photos were deleted\n");
-        }
-        else
-        {
-            System.out.println("Uncategorized photos were not deleted\n");
-        }
-
-        
         if (!isUserAuthorized())
         {
             System.out.println("-------- User NOT Authorized - can't use! --------");
@@ -74,11 +62,8 @@ public class AdminPage extends VerticalLayout{
         Long id = Long.parseLong((String)VaadinSession.getCurrent().getSession().getAttribute("userId"));
         if(id != 111111111)
         {
-            UI.getCurrent().getPage().setLocation("/home");
+            UI.getCurrent().getPage().setLocation("/");
         }
-        
-
-        userName = (String)VaadinSession.getCurrent().getSession().getAttribute("username");
         
         HorizontalLayout bottonPanel = new HorizontalLayout();//כפתורים
         HorizontalLayout mainLayout = new HorizontalLayout();//ריכוז של הכל
@@ -93,29 +78,19 @@ public class AdminPage extends VerticalLayout{
         btnRemoveAllPhotos.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
         Button btnMeasureModel = new Button("Measure Model", e -> nevigatMeasureModel());
         btnMeasureModel.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        //הוספה של כל הכפתורים
         bottonPanel.add(refreshBtn,deletBtn,btnShowPhotoUser,btnShowAllPhotos,btnRemoveAllPhotos,btnMeasureModel);
         
-
         //grid users
         gridUser = new Grid<User>(User.class);
         gridUser.setWidth("900px");
         gridUser.setColumns("id", "name", "pw");
         gridUser.setItems(userServise.getAllUser());
-        gridUser.addItemClickListener(event -> nevegatPhotoUser(event.getItem()));
-        
-        //grid photo
-        // gridPhotoUser = new Grid<Photo>(Photo.class);
-        // gridPhotoUser.setWidth("1100px");
-        // gridPhotoUser.setColumns("name", "description", "classification", "idOfUser");
-        // List<Photo> list = photoServise.getPhotoByUserId(userChos.getId());
-        // gridPhotoUser.setItems(list);
-        // gridPhotoUser.addItemClickListener(event -> showAllPhotoUser(userChos));
-        
+        gridUser.addItemClickListener(event -> setUserChosIsAdmin(event.getItem())); 
 
-      // if no 'username' attribute, this is a Guest.
-      String welcomeMsg = "Welcome Admin!";
-      if (userName != null)
-         welcomeMsg = "Welcome Admin " + userName.toUpperCase();
+        userName = (String)VaadinSession.getCurrent().getSession().getAttribute("username");
+        String welcomeMsg = "Welcome Admin!";
+        welcomeMsg = "Welcome Admin " + userName.toUpperCase();
 
         add(new H1(welcomeMsg));
         //showAllUsers();
@@ -129,7 +104,7 @@ public class AdminPage extends VerticalLayout{
         setAlignItems(Alignment.CENTER);
 
         
-        // listener for char changes
+        // listener for userGrid changes
         userServise.addUserChangeListener(new UserGridChangeListener()
         {
             @Override
@@ -142,20 +117,14 @@ public class AdminPage extends VerticalLayout{
             }
         });
 
-        // messageService.addChatChangeListener(() -> {
-        //     UI ui = getUI().orElseThrow();
-        //     ui.access(() -> refreshChat());
-        //     String msg = "\n---> " + userName + ": refreshChat() called from Listener ONLY when Chat changed!";
-        //     System.out.println(msg);
-        // });
-
         System.out.println("\n=======> ChatPage('/chat') constructor ends!\n");
     }
 
+    //measuremodel page פעולה שמנווטת ל
     private void nevigatMeasureModel() {
         UI.getCurrent().getPage().setLocation("/measuremodel");
     }
-
+    //DB - פעולה שמוחקת את כל התמונות שהמשתמשים העלו מה
     private void removeAllPhotos() {
         boolean res = photoServise.removeAllPhotos();
         if (res==true) {
@@ -168,8 +137,8 @@ public class AdminPage extends VerticalLayout{
     private void showAllPhotos() {
         UI.getCurrent().getPage().setLocation("/allphotos");
     }
-
-    private void nevegatPhotoUser(User user) {
+    //admin שנבחר הוא user הפעולה מתרחשת מתי שלוחצים על אחד מהמשתמשים שבטבלה, ובודקים האם אותו 
+    private void setUserChosIsAdmin(User user) {
 
         userChos = new User(user.getId(), user.getName(), user.getPw());
         userChos.setAdmin(user.getAdmin());
@@ -178,8 +147,6 @@ public class AdminPage extends VerticalLayout{
     private void deletUser(User userChos2) {
         if(userChos.getId()==null)
         {
-            // Notification notification = Notification.show("mast choose User",5000,Position.BOTTOM_START);
-            // notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
             Notification.show("mast choose User",5000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_WARNING);
             return;
         }
@@ -233,7 +200,7 @@ public class AdminPage extends VerticalLayout{
 
         if(list.size()==0)
         {
-            H2 h = new H2("There are no images to display");
+            H2 h = new H2("There are no images to display on "+user.getName());
             verLayout.add(h);
             verLayout.setAlignItems(Alignment.CENTER);
             add(verLayout);

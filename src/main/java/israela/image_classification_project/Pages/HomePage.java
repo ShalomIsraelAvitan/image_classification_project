@@ -32,7 +32,7 @@ public class HomePage extends VerticalLayout{
     userName = (String)VaadinSession.getCurrent().getSession().getAttribute("username");
 
       // if no 'username' attribute, this is a Guest.
-      String welcomeMsg = "Welcome Guest!";
+      String welcomeMsg = null;
       if (userName != null)
          welcomeMsg = "Welcome " + userName.toUpperCase();
 
@@ -71,23 +71,24 @@ public class HomePage extends VerticalLayout{
     
     //add(new Text(new Date() + ""));
     //add(imgLogo);
-    add(new H1(welcomeMsg));
-    add(imgLogo);
-    //add(new H3("( SessionID: " + sessionId + " )"));
-    add( helloPanel);
-    HorizontalLayout horizontalLayout = new HorizontalLayout();
-    horizontalLayout.add(new H3(str2));
-    horizontalLayout.add(h);
-    horizontalLayout.add(new H3(str3));
-    add(horizontalLayout);
-    h = new H3("Gallery");
-    h.getStyle().setColor("blue");
+        if(welcomeMsg!=null)
+            add(new H1(welcomeMsg));
+        add(imgLogo);
+        //add(new H3("( SessionID: " + sessionId + " )"));
+        add( helloPanel);
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.add(new H3(str2));
+        horizontalLayout.add(h);
+        horizontalLayout.add(new H3(str3));
+        add(horizontalLayout);
+        h = new H3("Gallery");
+        h.getStyle().setColor("blue");
 
-    HorizontalLayout horizontalLayout2 = new HorizontalLayout();
-    horizontalLayout2.add(new H3(str4));
-    horizontalLayout2.add(h);
-    horizontalLayout2.add(new H3(str3));
-    add(horizontalLayout2);
+        HorizontalLayout horizontalLayout2 = new HorizontalLayout();
+        horizontalLayout2.add(new H3(str4));
+        horizontalLayout2.add(h);
+        horizontalLayout2.add(new H3(str3));
+        add(horizontalLayout2);
 
     }
 private boolean isUserAuthorized()

@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.router.RouterLink;
@@ -48,6 +49,9 @@ public class AppMainLayout extends AppLayout
         H3 nameApp = new H3("Image Classification");
         nameApp.getStyle().setColor("blue");
         //logo.getStyle().setColor("#");
+
+        H3 strWelcome = new H3("Welcome Guest");
+        strWelcome.getStyle().setColor("black");
         
         RouterLink linkHome = new RouterLink("Home", HomePage.class);
         RouterLink linkUpload = new RouterLink("Upload", UploadPhotoPage.class);
@@ -65,9 +69,10 @@ public class AppMainLayout extends AppLayout
         btnLogIn.getStyle().setColor("black");
         Button btnLogout = new Button("Logout", e->logout());
         btnLogout.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR); // RED button
+        //VaadinIcon.USER.create()
 
         HorizontalLayout header  = new HorizontalLayout();
-        header.add(imgLogo,nameApp,linkHome,linkUpload,linkGallery,last,btnLogIn,btnSignUp);
+        header.add(imgLogo,nameApp,linkHome,linkUpload,linkGallery,last,VaadinIcon.USER.create(),strWelcome,btnLogIn,btnSignUp);
 
         header.getStyle();
         header.setWidthFull();
@@ -118,7 +123,7 @@ public class AppMainLayout extends AppLayout
         {
             try {
                 nameuser.setText(nameuser.getText() +"(admin)");
-                header.add(imgLogo,nameApp,linkHome,linkUpload,linkGallery,linkAdmin,last,nameuser,btnLogout);
+                header.add(imgLogo,nameApp,linkHome,linkUpload,linkGallery,linkAdmin,last,VaadinIcon.USER.create(),nameuser,btnLogout);
                 System.out.println("Admin Log in\n");
                 
             } catch (Exception e) {
@@ -128,7 +133,7 @@ public class AppMainLayout extends AppLayout
             
         }
         else
-            header.add(imgLogo,nameApp,linkHome,linkUpload,linkGallery,last,nameuser,btnLogout);
+            header.add(imgLogo,nameApp,linkHome,linkUpload,linkGallery,last,VaadinIcon.USER.create(),nameuser,btnLogout);
             //header.add(nameuser);
             //header.add(imgLogo,nameApp,linkHome,linkUpload,linkGallery,linkAdmin,last,btnLogout);
         //}

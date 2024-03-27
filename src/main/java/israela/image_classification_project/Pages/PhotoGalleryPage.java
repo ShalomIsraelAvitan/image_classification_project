@@ -12,6 +12,7 @@ import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -64,7 +65,7 @@ public class PhotoGalleryPage extends VerticalLayout{
              boolean b = photoService.removPhotoOfUserId(id);
              System.out.println("b = "+b);
              if(b==true){
-                Notification.show("remove Succeeded",5000, Position.TOP_CENTER);
+                Notification.show("remove Succeeded",5000, Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
              }
             
         } catch (Exception e) {

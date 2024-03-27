@@ -7,6 +7,21 @@ from py4j.java_gateway import JavaGateway, GatewayParameters
 import cv2
 #print("Enter to CNN\n")
 
+class Activation_Softmax:
+    def __init__(self):
+        super(Activation_Softmax, self).__init__()
+        
+    def forward(self, inputs):
+        exp_values = tf.exp(inputs - tf.reduce_max(inputs, axis=1, keepdims=True))
+        probabilities = exp_values / tf.reduce_sum(exp_values, axis=1, keepdims=True)
+        output = probabilities
+        print("output",output)
+        return output
+        
+    def get_config(self):
+        return {}
+    
+
 def predict_image(loaded_model, image_path):
         
         #img = tf.keras.utils.load_img(image_path,target_size=(256,256))
@@ -17,6 +32,9 @@ def predict_image(loaded_model, image_path):
         #img_array = tf.keras.utils.img_to_array(resize)
         #img_array = tf.expand_dims(img_array, 0) # Create a batch
         predicted = loaded_model.predict(np.expand_dims(resize/255,0))
+        softmax = Activation_Softmax()
+        predictedSoftmax = softmax.forward(predicted)
+
        
         #print("newImg[0][0] = {}".format(newImg[0][0]))
         #print("newImg[0] = {}".format(newImg[0]))
@@ -31,9 +49,9 @@ def predict_image(loaded_model, image_path):
         #print(predictions[1].numpy()*100)
         #return predictions[1]
 
-        print("the predicted =", predicted*100)
-        print(predicted[0][0]*100)
-        return predicted[0][0]
+        print("the predicted =", predictedSoftmax[0][1].numpy()*100)
+        print(predictedSoftmax[0][1].numpy()*100)
+        return predictedSoftmax[0][1].numpy()
 
 
 

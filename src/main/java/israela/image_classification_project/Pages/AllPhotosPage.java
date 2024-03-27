@@ -124,7 +124,6 @@ public class AllPhotosPage extends VerticalLayout{
         HorizontalLayout heder = new HorizontalLayout();
         HorizontalLayout heder2 = new HorizontalLayout();
         HorizontalLayout heder1 = new HorizontalLayout();
-        HorizontalLayout heder3 = new HorizontalLayout();
 
          Image image = new Image(resource, photo.getName());
          image.setHeight("240px");

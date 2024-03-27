@@ -3,6 +3,7 @@ package israela.image_classification_project.Pages;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -15,9 +16,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
+import israela.image_classification_project.AppMainLayout;
 import israela.image_classification_project.Services.UserServise;
 
-@Route(value = "/login")
+@Route(value = "/login",layout = AppMainLayout.class)
 @PageTitle("Login")
 public class LoginPage extends VerticalLayout
 {
@@ -32,6 +34,13 @@ public class LoginPage extends VerticalLayout
         System.err.println("LoginPage================>>\n");
         this.userService = userService;
 
+        if (isUserAuthorized())
+        {
+            System.out.println("-------- User Have Authorized - can't use! --------");
+            UI.getCurrent().getPage().setLocation("/"); // Redirect to Login page (HomePage).
+            return;
+        }
+
         fieldId = createFieldId(fieldId);
         fieldName = createFieldName(fieldName);
         fieldPw = createFieldPw(fieldPw);
@@ -43,8 +52,9 @@ public class LoginPage extends VerticalLayout
         fieldsPanel.setAlignItems(Alignment.CENTER);
         fieldsPanel.add(new Button("LogIn", e -> login(fieldId,fieldName,fieldPw)));
 
+        add(new H1("Welcome to LogIn page"));
         add(fieldsPanel);
-        //setAlignItems(Alignment.CENTER);
+        setAlignItems(Alignment.CENTER);
         
         
     }
@@ -55,11 +65,10 @@ public class LoginPage extends VerticalLayout
         fieldPw.setPlaceholder("Enter your Password");
         fieldPw.setHelperText("This Password will be your User Password");
         fieldId.setRequiredIndicatorVisible(false);
-        fieldPw.setErrorMessage("Password MUST BE ONLY WITH NUMBERS!");
-        fieldPw.setAllowedCharPattern("[0-9]"); // only letters & spaces
-        //fieldId.setPattern("\\w+\\s\\w+"); // regx for two-words & one space between.  
-        fieldPw.setMinLength(6); // min 6 chars
-        fieldPw.setMaxLength(9); // max 9 chars
+        fieldPw.setErrorMessage("Password MUST BE 6 NUMBERS AND NO LETTERS!");
+        fieldPw.setAllowedCharPattern("[0-9]"); // only numbers
+        fieldPw.setMinLength(6); // min 6 
+        fieldPw.setMaxLength(9); // max 9 
         fieldPw.setPrefixComponent(VaadinIcon.PASSWORD.create()); // add user icon
         fieldPw.setClearButtonVisible(true); // fast clear text (x)
         fieldPw.setValueChangeMode(ValueChangeMode.LAZY); // eed for ChangeListener.
@@ -73,12 +82,10 @@ public class LoginPage extends VerticalLayout
         fieldId = new TextField("ID");
         fieldId.setPlaceholder("Enter your ID");
         fieldId.setHelperText("This ID will be your User ID");
-        //fieldId.setRequiredIndicatorVisible(true);
-        fieldId.setErrorMessage("ID MUST BE ONLY WITH NUMBERS!");
+        fieldId.setErrorMessage("ID MUST BE 9 NUMBERS ONLY AND NO LETTERS!");
         fieldId.setAllowedCharPattern("[0-9]"); // only letters & spaces
-        //fieldId.setPattern("\\w+\\s\\w+"); // regx for two-words & one space between.  
-        fieldId.setMinLength(9); // min 9 chars
-        fieldId.setMaxLength(9); // max 9 chars
+        fieldId.setMinLength(9); // min 9 
+        fieldId.setMaxLength(9); // max 9 
         fieldId.setPrefixComponent(VaadinIcon.USER_CARD.create()); // add user icon
         fieldId.setClearButtonVisible(true); // fast clear text (x)
         fieldId.setValueChangeMode(ValueChangeMode.LAZY); // eed for ChangeListener.
@@ -92,11 +99,11 @@ public class LoginPage extends VerticalLayout
         fieldName.setPlaceholder("Enter your name");
          fieldName.setHelperText("This name will be your User Name");
          fieldName.setRequiredIndicatorVisible(true);
-         fieldName.setErrorMessage("Name MUST be with two words, one space between, 4-15 Letters!");
-         fieldName.setAllowedCharPattern("[a-zA-Z _ 0-9]"); // only letters & spaces
+         fieldName.setErrorMessage("Name MUST BE 4-15 Letters!");
+         fieldName.setAllowedCharPattern("[a-zA-Z _ 0-9]"); // only letters & spaces & numbers
          //fieldName.setPattern("\\w+\\s\\w+"); // regx for two-words & one space between.  
-         fieldName.setMinLength(4); // min 4 chars
-         fieldName.setMaxLength(15); // max 15 chars
+         fieldName.setMinLength(4); // min 4 
+         fieldName.setMaxLength(15); // max 15 
          fieldName.setPrefixComponent(VaadinIcon.USER.create()); // add user icon
          fieldName.setClearButtonVisible(true); // fast clear text (x)
          fieldName.setValueChangeMode(ValueChangeMode.LAZY); // eed for ChangeListener.
@@ -118,7 +125,7 @@ public class LoginPage extends VerticalLayout
             VaadinSession.getCurrent().getSession().setAttribute("userId", id.getValue());
             Notification.show("User Log In successfully",5000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);;
             //UI.getCurrent().navigate("/upload");
-            UI.getCurrent().getPage().setLocation("/");
+            UI.getCurrent().getPage().setLocation("/upload");
             return true;
 
         }
@@ -128,5 +135,11 @@ public class LoginPage extends VerticalLayout
         }
         
     }
-   
+    private boolean isUserAuthorized()
+    {
+        // try to get 'username' from session cookie (was created).
+        String userName = (String)VaadinSession.getCurrent().getSession().getAttribute("username");
+
+        return (userName == null) ? false : true;
+    }
 }

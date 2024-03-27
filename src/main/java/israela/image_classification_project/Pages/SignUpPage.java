@@ -14,10 +14,11 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
+import israela.image_classification_project.AppMainLayout;
 import israela.image_classification_project.User;
 import israela.image_classification_project.Services.UserServise;
 
-@Route(value = "/signup")
+@Route(value = "/signup",layout = AppMainLayout.class)
 @PageTitle("signup")
 public class SignUpPage extends VerticalLayout{
 
@@ -30,6 +31,13 @@ public class SignUpPage extends VerticalLayout{
     {
         System.err.println("SignUpPage===========>>\n");
         this.userService = userService;
+
+        if (isUserAuthorized())
+        {
+            System.out.println("-------- User Have Authorized - can't use! --------");
+            UI.getCurrent().getPage().setLocation("/"); // Redirect to SignUp page (HomePage).
+            return;
+        }
 
         fieldId = createFieldId(fieldId);
         fieldName = createFieldName(fieldName);
@@ -49,11 +57,11 @@ public class SignUpPage extends VerticalLayout{
         fieldPw.setPlaceholder("Enter your Password");
         fieldPw.setHelperText("This Password will be your User Password");
         //fieldId.setRequiredIndicatorVisible(true);
-        fieldPw.setErrorMessage("Password MUST BE ONLY WITH NUMBERS!");
-        fieldPw.setAllowedCharPattern("[0-9]"); // only letters & spaces
+        fieldPw.setErrorMessage("Password MUST BE 6 NUMBERS AND NO LETTERS!");
+        fieldPw.setAllowedCharPattern("[0-9]"); // only NUMBERS
         //fieldId.setPattern("\\w+\\s\\w+"); // regx for two-words & one space between.  
-        fieldPw.setMinLength(6); // min 6 chars
-        fieldPw.setMaxLength(9); // max 9 chars
+        fieldPw.setMinLength(6); // min 6 
+        fieldPw.setMaxLength(9); // max 9 
         fieldPw.setPrefixComponent(VaadinIcon.PASSWORD.create()); // add user icon
         fieldPw.setClearButtonVisible(true); // fast clear text (x)
         fieldPw.setValueChangeMode(ValueChangeMode.LAZY); // eed for ChangeListener.
@@ -67,11 +75,11 @@ public class SignUpPage extends VerticalLayout{
         fieldId.setPlaceholder("Enter your ID");
         fieldId.setHelperText("This ID will be your User ID");
         //fieldId.setRequiredIndicatorVisible(true);
-        fieldId.setErrorMessage("ID MUST BE ONLY WITH NUMBERS!");
+        fieldId.setErrorMessage("ID MUST BE 9 NUMBERS ONLY AND NO LETTERS!");
         fieldId.setAllowedCharPattern("[0-9]"); // only letters & spaces
         //fieldId.setPattern("\\w+\\s\\w+"); // regx for two-words & one space between.  
-        fieldId.setMinLength(9); // min 9 chars
-        fieldId.setMaxLength(9); // max 9 chars
+        fieldId.setMinLength(9); // min 9 
+        fieldId.setMaxLength(9); // max 9 
         fieldId.setPrefixComponent(VaadinIcon.USER_CARD.create()); // add user icon
         fieldId.setClearButtonVisible(true); // fast clear text (x)
         fieldId.setValueChangeMode(ValueChangeMode.LAZY); // eed for ChangeListener.
@@ -86,11 +94,10 @@ public class SignUpPage extends VerticalLayout{
         fieldName.setPlaceholder("Enter your name");
          fieldName.setHelperText("This name will be your User Name");
          fieldName.setRequiredIndicatorVisible(true);
-         fieldName.setErrorMessage("Name MUST be with two words, one space between, 4-15 Letters!");
-         fieldName.setAllowedCharPattern("[a-zA-Z _ 0-9]"); // only letters & spaces
-         //fieldName.setPattern("\\w+\\s\\w+"); // regx for two-words & one space between.  
-         fieldName.setMinLength(4); // min 4 chars
-         fieldName.setMaxLength(15); // max 15 chars
+         fieldName.setErrorMessage("Name MUST BE 4-15 Letters!");
+         fieldName.setAllowedCharPattern("[a-zA-Z _ 0-9]"); // only letters & spaces & numbers
+         fieldName.setMinLength(4); // min 4 
+         fieldName.setMaxLength(15); // max 15 
          fieldName.setPrefixComponent(VaadinIcon.USER.create()); // add user icon
          fieldName.setClearButtonVisible(true); // fast clear text (x)
          fieldName.setValueChangeMode(ValueChangeMode.LAZY); // eed for ChangeListener.
@@ -115,39 +122,18 @@ public class SignUpPage extends VerticalLayout{
             {
                 Notification.show("User successfully Sign Up",5000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
 
-                UI.getCurrent().navigate("/");
+                UI.getCurrent().navigate("/upload");
             }
             else{
                 Notification.show("User failed to Sign Up",5000,Position.TOP_CENTER);
             }
 
-        /* 
-        if (userService.isIdUsd(iD)) {
-            Notification.show("This ID allready Usd",5000, Position.TOP_CENTER);
-        }
-        else if(userService.isUserExists(name.getValue(),  iD, password)!= false)
-        {
-            Notification.show("This User Exsist",5000, Position.TOP_CENTER);
-
-            id.setValue("");
-            name.setValue("");
-            pw.setValue("");
-            
-
-        }else{
-
-            boolean x = userService.addUser(newUser);
-            VaadinSession.getCurrent().getSession().setAttribute("username", name.getValue());
-            VaadinSession.getCurrent().getSession().setAttribute("userId", id.getValue());
-            if(x==true )
-            {
-                Notification.show("User successfully Sign Up",5000,Position.TOP_CENTER).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-
-                UI.getCurrent().navigate("/home");
-            }
-            else{
-                Notification.show("User failed to Sign Up",5000,Position.TOP_CENTER);
-            }
-        }   */
     }
+    private boolean isUserAuthorized()
+        {
+        // try to get 'username' from session cookie (was created in the Welcome(login) page).
+        String userName = (String)VaadinSession.getCurrent().getSession().getAttribute("username");
+
+        return (userName == null) ? false : true;
+        }
 }
