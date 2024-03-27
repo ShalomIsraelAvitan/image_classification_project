@@ -53,24 +53,20 @@ public class HomePage extends VerticalLayout{
 
       Image imgLogo = new Image(IMAGE_URL, "Home image");
       imgLogo.setHeight("250px");
-    HorizontalLayout helloPanel = new HorizontalLayout();
-    helloPanel.setAlignItems(Alignment.BASELINE);
-    //TextField fieldName = new TextField("Your Name");
-    String str = "On this website, you can upload photos of your paintings and check whether the painting is a realism or abstract painting";
-    String str2 = "In order to upload your drawings, you will have to click on the";
-    String str3 = "button, located in the navigation bar on the top left.";
-    String str4 = "If you want to see the photos you uploaded, you can click on the";
+        HorizontalLayout helloPanel = new HorizontalLayout();
+        helloPanel.setAlignItems(Alignment.BASELINE);
+        //TextField fieldName = new TextField("Your Name");
+        String str = "On this website, you can upload photos of your paintings and check whether the painting is a realism or abstract painting";
+        String str2 = "In order to upload your drawings, you will have to click on the";
+        String str3 = "button, located in the navigation bar on the top left.";
+        String str4 = "If you want to see the photos you uploaded, you can click on the";
 
-    H3 h = new H3("upload");
-    h.getStyle().setColor("blue");
-    //add(h );
-    //helloPanel.add(fieldName, btnSayHello);
 
-    //helloPanel.add(btnLogin,btnSignUp);
-    helloPanel.add(new H3(str));
-    
-    //add(new Text(new Date() + ""));
-    //add(imgLogo);
+        H3 h = new H3("Upload");
+        h.getStyle().setColor("blue");
+
+        helloPanel.add(new H3(str));
+        
         if(welcomeMsg!=null)
             add(new H1(welcomeMsg));
         add(imgLogo);
@@ -81,6 +77,7 @@ public class HomePage extends VerticalLayout{
         horizontalLayout.add(h);
         horizontalLayout.add(new H3(str3));
         add(horizontalLayout);
+        
         h = new H3("Gallery");
         h.getStyle().setColor("blue");
 
@@ -90,13 +87,21 @@ public class HomePage extends VerticalLayout{
         horizontalLayout2.add(new H3(str3));
         add(horizontalLayout2);
 
-    }
-private boolean isUserAuthorized()
-    {
-        // try to get 'username' from session cookie (was created in the Welcome(login) page).
-        String userName = (String)VaadinSession.getCurrent().getSession().getAttribute("username");
+        addAdminGuidelines((String)VaadinSession.getCurrent().getSession().getAttribute("username"));
 
-        return (userName == null) ? false : true;
     }
-   
+    private void addAdminGuidelines(String userName) {
+        if(userName==null)
+            return;
+        String str = "If you would like to enter your Admin page, you can click on the";
+        H3 h = new H3("Admin");
+        h.getStyle().setColor("blue");
+        String str2 = "button, located in the navigation bar on the top left.";
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.add(new H3(str));
+        horizontalLayout.add(h);
+        horizontalLayout.add(new H3(str2));
+        add(horizontalLayout);
+    }
 }
